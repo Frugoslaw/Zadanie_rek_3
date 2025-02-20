@@ -15,7 +15,7 @@
     <li>PHP 8.x</li>
     <li>Laravel 11 (najnowsza stabilna wersja)</li>
     <li>Composer</li>
-    <li>Baza danych (SQLite, MySQL, itp.)</li>
+    <li>Baza danych (SQLite)</li>
     <li>Klucze TMDB:
       <ul>
         <li><strong>TMDB_API_KEY</strong></li>
@@ -164,22 +164,6 @@ TMDB_READ_TOKEN=TWÓJ_TMBD_READ_TOKEN</code></pre>
   </p>
 </code></pre>
   <p>Dzięki metodom <code>setTranslation()</code> oraz <code>getTranslation()</code> możesz ustawiać i pobierać tłumaczenia dla danego języka.</p>
-
-  <h2>Problemy SSL i cURL</h2>
-  <p>
-    Jeśli podczas pobierania danych z TMDB pojawi się błąd cURL (np. <strong>cURL error 60</strong>), pobierz plik <code>cacert.pem</code> z <a href="https://curl.se/ca/cacert.pem" target="_blank">curl.se/ca/cacert.pem</a> i skonfiguruj go w pliku <code>php.ini</code>:
-  </p>
-  <pre><code>curl.cainfo="C:\xampp\php\extras\ssl\cacert.pem"
-openssl.cafile="C:\xampp\php\extras\ssl\cacert.pem"</code></pre>
-  <p>Następnie zrestartuj terminal, aby zmiany zaczęły obowiązywać.</p>
-
-  <h2>Uruchamianie komendy</h2>
-  <p>Aby pobrać dane z TMDB, uruchom komendę:</p>
-  <pre><code>php artisan tmdb:fetch</code></pre>
-  <p>
-    Komenda pobiera 50 filmów, 10 seriali oraz wszystkie gatunki i zapisuje je w bazie danych, ustawiając tłumaczenia dla wybranych języków.
-  </p>
-
 
   <h2>License</h2>
   <p>Ten projekt jest dostępny na licencji MIT.</p>
