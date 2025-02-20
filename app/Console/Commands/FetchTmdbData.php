@@ -150,18 +150,18 @@ class FetchTmdbData extends Command
             }
         }
 
-        // Uproszczone tworzenie lub aktualizacja rekordu z tłumaczeniami
         foreach ($allGenres as $genreData) {
             $translations = [
-                'en' => $genreData['en'] ?? '',
-                'pl' => $genreData['pl'] ?? '',
-                'de' => $genreData['de'] ?? '',
+                'en-EN' => $genreData['en'] ?? '',
+                'pl-PL' => $genreData['pl'] ?? '',
+                'de-DE' => $genreData['de'] ?? '',
             ];
             Genre::updateOrCreate(
                 ['tmdb_id' => $genreData['tmdb_id']],
                 ['name' => $translations]
             );
         }
+
         $this->info('Gatunki pobrane i zapisane.');
     }
 }
