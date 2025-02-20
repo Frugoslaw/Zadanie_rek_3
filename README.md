@@ -2,39 +2,6 @@
 <html lang="pl">
 <head>
   <meta charset="UTF-8">
-  <title>Laravel TMDB Application</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      line-height: 1.6;
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-    code {
-      background-color: #f4f4f4;
-      padding: 2px 4px;
-      border-radius: 3px;
-      font-family: Consolas, monospace;
-    }
-    pre {
-      background-color: #f4f4f4;
-      padding: 10px;
-      border-radius: 3px;
-      overflow-x: auto;
-    }
-    a {
-      color: #0366d6;
-      text-decoration: none;
-    }
-    a:hover {
-      text-decoration: underline;
-    }
-    h1, h2, h3 {
-      border-bottom: 1px solid #eaecef;
-      padding-bottom: 5px;
-    }
-  </style>
 </head>
 <body>
   <h1>Laravel TMDB Application</h1>
@@ -61,7 +28,7 @@
   <ol>
     <li>
       <strong>Klonowanie repozytorium:</strong>
-      <pre><code>git clone https://github.com/twoj_uzytkownik/tmdb_app.git
+      <pre><code>git clone https://github.com/Frugoslaw/Zadanie_rek_3.git
 cd tmdb_app</code></pre>
     </li>
     <li>
