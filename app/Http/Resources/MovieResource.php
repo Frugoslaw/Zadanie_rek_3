@@ -4,21 +4,21 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Str;
+use App\Enums\LanguageEnum;
 
 class MovieResource extends JsonResource
 {
     public function toArray($request)
     {
         $lang = $request->query('lang', 'en-US');
-        $title = $this->getTranslation('title', $lang);
 
         return [
             'id'            => $this->id,
             'tmdb_id'       => $this->tmdb_id,
-            'title'         => $title,
+            'title'         => $this->getTranslation('title', $lang),
             'overview'      => $this->getTranslation('overview', $lang),
-            'seo_title'     => $title . ' ' . $this->prefix, // SEO tytuł
-            'slug'          => Str::slug($title), // Dynamiczne generowanie sluga
+            'seo_title'     => $this->getTranslation('title', $lang) . ' ' . $this->prefix,
+            'slug'          => $this->getTranslation('slug', $lang),
             'release_date'  => $this->release_date,
             'poster_path'   => $this->poster_path,
             'backdrop_path' => $this->backdrop_path,
@@ -27,6 +27,7 @@ class MovieResource extends JsonResource
             'popularity'    => $this->popularity,
             'adult'         => $this->adult,
             'video'         => $this->video,
+            'prefix'        => $this->prefix,
         ];
     }
 }

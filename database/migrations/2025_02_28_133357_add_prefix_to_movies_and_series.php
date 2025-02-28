@@ -9,21 +9,23 @@ return new class extends Migration {
     {
         Schema::table('movies', function (Blueprint $table) {
             $table->string('prefix')->default('Film')->after('title');
+            $table->string('slug')->nullable()->after('prefix');
         });
 
         Schema::table('series', function (Blueprint $table) {
             $table->string('prefix')->default('Serial')->after('title');
+            $table->string('slug')->nullable()->after('prefix');
         });
     }
 
     public function down(): void
     {
         Schema::table('movies', function (Blueprint $table) {
-            $table->dropColumn(['prefix']);
+            $table->dropColumn(['prefix', 'slug']);
         });
 
         Schema::table('series', function (Blueprint $table) {
-            $table->dropColumn(['prefix']);
+            $table->dropColumn(['prefix', 'slug']);
         });
     }
 };

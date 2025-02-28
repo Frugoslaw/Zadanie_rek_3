@@ -65,6 +65,7 @@ class TmdbService
                     ]
                 );
 
+
                 // Pobieranie i przypisywanie gatunków do filmu
                 if (!empty($data['genre_ids'])) {
                     $genres = Genre::whereIn('tmdb_id', $data['genre_ids'])->pluck('id');
