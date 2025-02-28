@@ -16,7 +16,7 @@ class FetchTmdbData extends Command
     // Języki dla filmów i seriali
     protected $languages = ['en-US', 'pl-PL', 'de-DE'];
     // Języki dla gatunków (używamy krótszych kodów)
-    protected $genreLanguages = ['en', 'pl', 'de'];
+    protected $genreLanguages = ['en-US', 'pl-PL', 'de-DE'];
 
     public function handle()
     {
@@ -152,9 +152,9 @@ class FetchTmdbData extends Command
 
         foreach ($allGenres as $genreData) {
             $translations = [
-                'en-EN' => $genreData['en'] ?? '',
-                'pl-PL' => $genreData['pl'] ?? '',
-                'de-DE' => $genreData['de'] ?? '',
+                'en-US' => $genreData['en-US'] ?? '',
+                'pl-PL' => $genreData['pl-PL'] ?? '',
+                'de-DE' => $genreData['de-DE'] ?? '',
             ];
             Genre::updateOrCreate(
                 ['tmdb_id' => $genreData['tmdb_id']],
