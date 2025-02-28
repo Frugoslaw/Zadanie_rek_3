@@ -4,6 +4,7 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Client\RequestException;
 use App\Models\Movie;
 use App\Models\Serie;
 use App\Models\Genre;
@@ -22,9 +23,11 @@ class TmdbService
         $this->languages = LanguageEnum::all();
     }
 
-    public function fetchMovies(): void
+    public function fetchMovies(): bool
     {
         try {
+            Log::info('Fetching movies...');
+
             $response = Http::withToken($this->readToken)
                 ->get('https://api.themoviedb.org/3/movie/popular', [
                     'api_key'  => $this->apiKey,
@@ -33,10 +36,16 @@ class TmdbService
                 ]);
 
             if (!$response->successful()) {
-                throw new \Exception('Error fetching movies from TMDB.');
+                throw new RequestException($response);
             }
 
             $movies = array_slice($response->json('results', []), 0, 50);
+
+            if (empty($movies)) {
+                Log::warning('API returned empty movie list!');
+                return false;
+            }
+
             foreach ($movies as $data) {
                 $movie = Movie::updateOrCreate(
                     ['tmdb_id' => $data['id']],
@@ -54,6 +63,15 @@ class TmdbService
                     ]
                 );
 
+                // Pobieranie i przypisywanie gatunków do filmu
+                if (!empty($data['genre_ids'])) {
+                    $genres = Genre::whereIn('tmdb_id', $data['genre_ids'])->pluck('id');
+                    $movie->genres()->sync($genres);
+                }
+                Log::debug("Movie ID: {$data['id']}, Genres: " . json_encode($data['genre_ids']));
+
+
+                // Pobieranie tłumaczeń
                 foreach ($this->languages as $lang) {
                     $detail = Http::withToken($this->readToken)
                         ->get("https://api.themoviedb.org/3/movie/{$data['id']}", [
@@ -66,14 +84,20 @@ class TmdbService
                 }
                 $movie->save();
             }
-        } catch (\Exception $e) {
+
+            Log::info('Movies fetched successfully.');
+            return true;
+        } catch (RequestException $e) {
             Log::error('TMDB Scraper - fetchMovies failed: ' . $e->getMessage());
+            return false;
         }
     }
 
-    public function fetchSeries(): void
+    public function fetchSeries(): bool
     {
         try {
+            Log::info('Fetching series...');
+
             $response = Http::withToken($this->readToken)
                 ->get('https://api.themoviedb.org/3/tv/popular', [
                     'api_key'  => $this->apiKey,
@@ -82,10 +106,16 @@ class TmdbService
                 ]);
 
             if (!$response->successful()) {
-                throw new \Exception('Error fetching series from TMDB.');
+                throw new RequestException($response);
             }
 
             $series = array_slice($response->json('results', []), 0, 10);
+
+            if (empty($series)) {
+                Log::warning('API returned empty series list!');
+                return false;
+            }
+
             foreach ($series as $data) {
                 $serie = Serie::updateOrCreate(
                     ['tmdb_id' => $data['id']],
@@ -102,6 +132,12 @@ class TmdbService
                     ]
                 );
 
+                // Pobieranie i przypisywanie gatunków do serialu
+                if (!empty($data['genre_ids'])) {
+                    $genres = Genre::whereIn('tmdb_id', $data['genre_ids'])->pluck('id');
+                    $serie->genres()->sync($genres);
+                }
+
                 foreach ($this->languages as $lang) {
                     $detail = Http::withToken($this->readToken)
                         ->get("https://api.themoviedb.org/3/tv/{$data['id']}", [
@@ -114,46 +150,62 @@ class TmdbService
                 }
                 $serie->save();
             }
-        } catch (\Exception $e) {
+
+            Log::info('Series fetched successfully.');
+            return true;
+        } catch (RequestException $e) {
             Log::error('TMDB Scraper - fetchSeries failed: ' . $e->getMessage());
+            return false;
         }
     }
 
-    public function fetchGenres(): void
+    public function fetchGenres(): bool
     {
         try {
+            Log::info('Fetching genres...');
             $allGenres = [];
+
+            $response = Http::withToken($this->readToken)
+                ->get('https://api.themoviedb.org/3/genre/movie/list', [
+                    'api_key'  => $this->apiKey,
+                    'language' => LanguageEnum::ENGLISH->value,
+                ]);
+
+            if (!$response->successful()) {
+                throw new RequestException($response);
+            }
+
+            foreach ($response->json('genres', []) as $data) {
+                $allGenres[$data['id']] = [
+                    'tmdb_id' => $data['id'],
+                    'name'    => [],
+                ];
+            }
 
             foreach ($this->languages as $lang) {
                 $response = Http::withToken($this->readToken)
                     ->get('https://api.themoviedb.org/3/genre/movie/list', [
                         'api_key'  => $this->apiKey,
                         'language' => $lang,
-                    ]);
+                    ])->json();
 
-                if (!$response->successful()) {
-                    throw new \Exception("Error fetching genres for language: $lang.");
-                }
-
-                foreach ($response->json('genres', []) as $data) {
-                    $allGenres[$data['id']]['tmdb_id'] = $data['id'];
-                    $allGenres[$data['id']][$lang] = $data['name'];
+                foreach ($response['genres'] as $data) {
+                    $allGenres[$data['id']]['name'][$lang] = $data['name'];
                 }
             }
 
             foreach ($allGenres as $genreData) {
-                $translations = [];
-                foreach (LanguageEnum::cases() as $langCase) {
-                    $translations[$langCase->value] = $genreData[$langCase->value] ?? '';
-                }
-
                 Genre::updateOrCreate(
                     ['tmdb_id' => $genreData['tmdb_id']],
-                    ['name' => $translations]
+                    ['name' => $genreData['name']]
                 );
             }
-        } catch (\Exception $e) {
+
+            Log::info('Genres fetched successfully.');
+            return true;
+        } catch (RequestException $e) {
             Log::error('TMDB Scraper - fetchGenres failed: ' . $e->getMessage());
+            return false;
         }
     }
 }

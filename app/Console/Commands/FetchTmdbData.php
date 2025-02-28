@@ -19,6 +19,10 @@ class FetchTmdbData extends Command
     public function handle(): void
     {
         try {
+            $this->info('Fetching genres...');
+            $this->tmdbService->fetchGenres();
+            $this->info('Genres fetched successfully.');
+
             $this->info('Fetching movies...');
             $this->tmdbService->fetchMovies();
             $this->info('Movies fetched successfully.');
@@ -27,9 +31,6 @@ class FetchTmdbData extends Command
             $this->tmdbService->fetchSeries();
             $this->info('Series fetched successfully.');
 
-            $this->info('Fetching genres...');
-            $this->tmdbService->fetchGenres();
-            $this->info('Genres fetched successfully.');
 
             $this->info('TMDB data has been successfully fetched and stored.');
         } catch (\Exception $e) {

@@ -7,16 +7,15 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::create('genres', function (Blueprint $table) {
+        Schema::create('genre_movie', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('tmdb_id')->unique();
-            $table->json('name'); // Przechowujemy jako JSON dla wielojęzyczności
-            $table->timestamps();
+            $table->foreignId('genre_id')->constrained()->onDelete('cascade');
+            $table->foreignId('movie_id')->constrained()->onDelete('cascade');
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('genres');
+        Schema::dropIfExists('genre_movie');
     }
 };

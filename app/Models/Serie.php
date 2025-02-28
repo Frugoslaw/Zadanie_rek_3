@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Spatie\Translatable\HasTranslations;
 
 class Serie extends Model
@@ -23,4 +24,9 @@ class Serie extends Model
     ];
 
     public $translatable = ['title', 'overview'];
+
+    public function genres(): BelongsToMany
+    {
+        return $this->belongsToMany(Genre::class, 'genre_serie');
+    }
 }
