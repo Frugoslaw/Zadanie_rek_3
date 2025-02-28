@@ -10,8 +10,9 @@ class FetchTmdbData extends Command
     protected $signature = 'tmdb:fetch';
     protected $description = 'Fetches data from TMDB and saves it to the database';
 
-    public function __construct(private readonly TmdbService $tmdbService)
+    public function __construct(TmdbService $tmdbService)
     {
+        $this->tmdbService = $tmdbService;
         parent::__construct();
     }
 
