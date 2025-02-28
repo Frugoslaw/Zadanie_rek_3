@@ -9,18 +9,27 @@ use App\Http\Resources\SerieResource;
 
 class SerieController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
         $series = Serie::all();
         return response()->json(SerieResource::collection($series), 200);
     }
 
-    public function show(Request $request, $tmdbId)
+    public function show($id)
     {
-        $serie = Serie::where('tmdb_id', $tmdbId)->first();
-        if (!$serie) {
-            return response()->json(['error' => 'Serial nie został znaleziony.'], 404);
-        }
+        $serie = Serie::findOrFail($id);
         return response()->json(new SerieResource($serie), 200);
+    }
+
+    public function updatePrefix(UpdatePrefixRequest $request, $id)
+    {
+        $serie = Serie::findOrFail($id);
+        $serie->prefix = $request->validated();
+        $serie->save();
+
+        return response()->json([
+            'message' => 'Prefix updated successfully',
+            'serie'   => new SerieResource($serie)
+        ], 200);
     }
 }
